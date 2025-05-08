@@ -14,3 +14,4 @@
   - [ ] create levels of verbosity:
     - [ ] default: log ghosted files
     - [ ] higher: log skipped as a single output
+- [ ] Update file argument checks: create new dir etc
