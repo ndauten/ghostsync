@@ -1,0 +1,16 @@
+# Tasks
+
+- [x] Create simple shell script version
+- [x] Initial rust variant
+- [ ] Switch to libc based dataless check for performance
+- [ ] add timeout on cpy in case we missed some files
+- [x] Add automatic loggin and verbose output
+- [ ] Make archiving the old output a command line option
+- [ ] add `brctl download` to rsync and clean up
+- [ ] add in place progress bar
+- [ ] add summary at the beginning
+
+- [ ] Logging:
+  - [ ] create levels of verbosity:
+    - [ ] default: log ghosted files
+    - [ ] higher: log skipped as a single output
