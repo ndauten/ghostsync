@@ -86,9 +86,19 @@ fn main() {
     let log_file = File::create(&log_path).expect("Unable to create log file");
     let mut log = BufWriter::new(log_file);
 
+    println!("Walking directories for file lists: {}", source.display());
     let entries: Vec<_> = WalkDir::new(source)
+        .follow_links(false)
         .into_iter()
         .filter_map(Result::ok)
+        .filter(|e| {
+            if is_dataless(e.path()) {
+                writeln!(log, "Skipping dataless: {}", e.path().display());
+                false
+            } else {
+                true
+            }
+        })
         .filter(|e| e.file_type().is_file())
         .collect();
 
