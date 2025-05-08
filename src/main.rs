@@ -7,6 +7,19 @@ use walkdir::WalkDir;
 use xattr::FileExt;
 
 fn is_dataless(path: &Path) -> bool {
+    // BSD flag check via ls -ldO for "dataless"
+    if let Ok(output) = std::process::Command::new("ls")
+        .arg("-ldO")
+        .arg(path)
+        .output()
+    {
+        if let Ok(stdout) = String::from_utf8(output.stdout) {
+            if stdout.contains("dataless") {
+                println!("BSD FLAG dataless detected on {}", path.display());
+                return true;
+            }
+        }
+    }
     if let Ok(file) = File::open(path) {
         if let Ok(xattrs) = file.list_xattr() {
             let mut found = false;
