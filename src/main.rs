@@ -46,7 +46,7 @@ fn log_xattrs(path: &Path, log: &mut BufWriter<File>) {
 }
 
 fn main() {
-    let matches = Command::new("copy_local")
+    let matches = Command::new("ghostsync")
         .about("Copy non-dataless files from a source to a destination, preserving structure.")
         .arg(Arg::new("source").required(true).help("Source directory"))
         .arg(Arg::new("dest").required(true).help("Destination directory"))
@@ -60,14 +60,19 @@ fn main() {
             .long("logfile")
             .value_name("FILE")
             .help("Output log file path"))
+        .arg(Arg::new("backuplog")
+            .short('b')
+            .long("backup")
+            .help("Backup Output log file: defaults to /tmp/ghostsync_log_*")
+            .action(ArgAction::SetTrue))
         .get_matches();
 
     let source = Path::new(matches.get_one::<String>("source").unwrap());
     let dest = Path::new(matches.get_one::<String>("dest").unwrap());
 
-    let default_log_path = PathBuf::from("copy_log_latest.txt");
-    if default_log_path.exists() {
-        let backup_name = format!("copy_log_backup_{}.txt", Local::now().format("%Y%m%d_%H%M%S"));
+    let default_log_path = PathBuf::from("ghostsync_log.txt");
+    if default_log_path.exists() && matches.get_flag("backuplog") {
+        let backup_name = format!("ghostsync_log_backup_{}.txt", Local::now().format("%Y%m%d_%H%M%S"));
         fs::rename(&default_log_path, backup_name).expect("Failed to create log backup");
     }
 
@@ -118,7 +123,7 @@ fn main() {
             if verbose { print!("{}", msg); }
         } else {
             copied += 1;
-            println!("COPYING: {}", src_path.display());
+            if verbose { println!("COPYING: {}", src_path.display()); }
             if let Some(parent) = dst_path.parent() {
                 fs::create_dir_all(parent).unwrap_or_else(|_| panic!("Failed to create {}", parent.display()));
             }
