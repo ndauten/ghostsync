@@ -7,6 +7,8 @@ use walkdir::WalkDir;
 use xattr::FileExt;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
+mod cloud_analysis;
+use cloud_analysis::analyze_file;
 
 fn is_dataless(path: &Path) -> bool {
     // BSD flag check via ls -ldO for "dataless"
@@ -101,6 +103,18 @@ fn main() {
         })
         .filter(|e| e.file_type().is_file())
         .collect();
+
+    println!("Tracking file lists now");
+    for entry in WalkDir::new(&source).follow_links(true) {
+        if let Ok(entry) = entry {
+            let path = entry.path();
+            if path.is_file() || path.is_symlink() {
+                if let Some((filepath, flags, xattrs, filetype)) = analyze_file(path) {
+                    println!("{:<60} | {:<10} | {:<30} | {}", filepath, flags, xattrs, filetype);
+                }
+            }
+        }
+    }
 
     let total = entries.len();
     println!("Analyzing directory: {}", source.display());
