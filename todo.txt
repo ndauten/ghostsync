@@ -15,3 +15,5 @@
     - [ ] default: log ghosted files
     - [ ] higher: log skipped as a single output
 - [ ] Update file argument checks: create new dir etc
+- [ ] fix bug on log file and multiple ghostsync instances run from the same
+  directory
